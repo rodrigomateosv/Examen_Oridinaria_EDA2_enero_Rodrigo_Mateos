@@ -1,65 +1,248 @@
-class Nodo:
-    def __init__(self, valor):
-        self.valor = valor
-        self.siguiente = None
+from tda_cola import Cola, cola_vacia, arribo, atencion
+from tda_heap import Heap, arribo as arribo_h, heap_vacio, atencion as atencion_h
+from tda_heap import cambiar_prioridad, buscar as buscar_h
+from tda_lista_lista import Lista, barrido, eliminar, insertar
+from tda_pila_dinamico import Pila, apilar, pila_vacia, desapilar
+from math import inf
 
-class ListaEnlazada:
+
+class nodoArista(object):
+    """Clase nodo vértice."""
+
+    def __init__(self, info, destino):
+        """Crea un nodo arista con la información cargada."""
+        self.info = info
+        self.destino = destino
+        self.sig = None
+
+
+class nodoVertice(object):
+    """Clase nodo vértice."""
+
+    def __init__(self, info, datos=None):
+        """Crea un nodo vértice con la información cargada."""
+        self.info = info
+        self.datos = datos
+        self.sig = None
+        self.visitado = False
+        self.adyacentes = Arista() # lista de aristas
+
+
+class Grafo(object):
+    """Clase grafo implementación lista de listas de adyacencia."""
+
+    def __init__(self, dirigido=True):
+        """Crea un grafo vacio."""
+        self.inicio = None
+        self.dirigido = dirigido
+        self.tamanio = 0
+
+
+class Arista(object):
+    """Clase lista de arsitas implementación sobre lista."""
+
     def __init__(self):
-        self.cabeza = None
-        self.fin = None
+        """Crea una lista de aristas vacia."""
+        self.inicio = None
+        self.tamanio = 0
 
-    def agregar(self, valor):
-        nuevo_nodo = Nodo(valor)
-        if self.cabeza is None:
-            self.cabeza = nuevo_nodo
-            self.fin = nuevo_nodo
-        else:
-            self.fin.siguiente = nuevo_nodo
-            self.fin = nuevo_nodo
 
-    def contador_por_dic(self, dic_prev, dic):
-        contador = 0
-        a = [[4, 6], [6, 8], [7, 9], [4, 8], [3, 9, 0], [], [1, 7, 0], [2, 6], [1, 3], [2, 4]]
-        nodo_actual = self.cabeza
-        while nodo_actual is not None:
-            i = nodo_actual.valor
-            for j in range(len(a[i])):
-                for k in range(len(a[a[i][j]])):
-                    dic[a[a[i][j]][k]] += dic_prev[i]
-                    contador += dic_prev[i]
-            nodo_actual = nodo_actual.siguiente
-        return contador, dic
+def insertar_vertice(grafo, dato, datos=None):
+    """Inserta un vértice al grafo."""
+    nodo = nodoVertice(dato, datos)
+    if (grafo.inicio is None or grafo.inicio.info > dato):
+        nodo.sig = grafo.inicio
+        grafo.inicio = nodo
+    else:
+        ant = grafo.inicio
+        act = grafo.inicio.sig
+        while(act is not None and act.info < nodo.info):
+            ant = act
+            act = act.sig
+        nodo.sig = act
+        ant.sig = nodo
+    grafo.tamanio += 1
 
-    def n_dic(self, n):
-        dic_prevpar = {0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1}
-        dic_previmpar = {0: 2, 1: 2, 2: 2, 3: 2, 4: 3, 5: 0, 6: 3, 7: 2, 8: 2, 9: 2}
-        cont = 0
-        for i in range(n-1):
-            if i % 2 == 0:
-                dicp = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0}
-                cont, dicp = self.contador_por_dic(dic_prevpar, dicp)
-                print("{}:".format(i+2), cont)
-                # print(dicp, "\n") #Descomentar para ver los diccionarios intermedios pares
-                self.cabeza = None
-                self.fin = None
-                for key, value in dicp.items():
-                    if value > 0:
-                        self.agregar(key)
-                dic_prevpar = dicp
-            else:
-                dici = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0}
-                cont, dici = self.contador_por_dic(dic_previmpar, dici)
-                print("{}:".format(i+2), cont)
-                # print(dici, "\n") #Descomentar para ver los diccionarios intermedios impares
-                self.cabeza = None
-                self.fin = None
-                for key, value in dici.items():
-                    if value > 0:
-                        self.agregar(key)
-                dic_previmpar = dici
-        return cont
+def insertar_arista(grafo, dato, origen, destino):
+    """Inserta una arista desde el vértice origen al destino."""
+    agregrar_arista(origen.adyacentes, dato, destino.info)
+    if(not grafo.dirigido):
+        agregrar_arista(destino.adyacentes, dato, origen.info)
 
-print("Solución para el problema de los caballos:")
-lista = ListaEnlazada()
-lista.agregar(0)
-lista.n_dic(32)
+def agregrar_arista(origen, dato, destino):
+    """Agrega la arista desde el vértice origen al destino."""
+    nodo = nodoArista(dato, destino)
+    if (origen.inicio is None or origen.inicio.destino > destino):
+        nodo.sig = origen.inicio
+        origen.inicio = nodo
+    else:
+        ant = origen.inicio
+        act = origen.inicio.sig
+        while(act is not None and act.destino < nodo.destino):
+            ant = act
+            act = act.sig
+        nodo.sig = act
+        ant.sig = nodo
+    origen.tamanio += 1
+
+def eliminar_vertice(grafo, clave):
+    """Elimina un vertice del grafo y lo devuelve si lo encuentra."""
+    x = None
+    if(grafo.inicio.info == clave):
+        x = grafo.inicio.info
+        grafo.inicio = grafo.inicio.sig
+        grafo.tamanio -= 1
+    else:
+        ant = grafo.inicio
+        act = grafo.inicio.sig
+        while(act is not None and act.info != clave):
+            ant = act
+            act = act.sig
+        if (act is not None):
+            x = act.info
+            ant.sig = act.sig
+            grafo.tamanio -= 1
+    if(x is not None):
+        aux = grafo.inicio
+        while(aux is not None):
+            if(aux.adyacentes.inicio is not None):
+                quitar_arista(aux.adyacentes, clave)
+            aux = aux.sig
+        # aca terminar eliminar aristas adyacenes grafo no dirigido
+    return x
+
+
+def quitar_arista(vertice, destino):
+    x = None
+    if(vertice.adyacentes.inicio.destino == destino):
+        x = vertice.adyacentes.inicio.info
+        vertice.adyacentes.inicio = vertice.adyacentes.inicio.sig
+        vertice.adyacentes.tamanio -= 1
+    else:
+        ant = vertice.adyacentes.inicio
+        act = vertice.adyacentes.inicio.sig
+        while(act is not None and act.destino != destino):
+            ant = act
+            act = act.sig
+        if (act is not None):
+            x = act.info
+            ant.sig = act.sig
+            vertice.adyacentes.tamanio -= 1
+    return x
+
+def eliminar_arista(grafo, vertice, destino):
+    """Elimina una arsita del vertice y lo devuelve si lo encuentra."""
+    x = quitar_arista(vertice, destino)    
+    
+    if(not grafo.dirigido):
+        ori = buscar_vertice(grafo, destino)
+        quitar_arista(ori, vertice.info)
+
+    return x
+
+def barrido_vertices(grafo):
+    """Realiza un barrido de la grafo mostrando sus valores."""
+    aux = grafo.inicio
+    while(aux is not None):
+        print('vertice:', aux.info)
+        print('adyacentes:')
+        adyacentes(aux)
+        aux = aux.sig
+
+
+def buscar_vertice(grafo, buscado):
+    """Devuelve la direccion del elemento buscado."""
+    aux = grafo.inicio
+    while(aux is not None and aux.info != buscado):
+        aux = aux.sig
+    return aux
+
+def buscar_arista(vertice, buscado):
+    """Devuelve la direccion del elemento buscado."""
+    aux = vertice.adyacentes.inicio
+    while(aux is not None and aux.destino != buscado):
+        aux = aux.sig
+    return aux
+
+
+def tamanio(grafo):
+    """Devuelve el numero de vertices en el grafo."""
+    return grafo.tamanio
+
+
+def grafo_vacio(grafo):
+    """Devuelve true si el grafo esta vacio."""
+    return grafo.inicio is None
+
+def distancia_maxima(grafo):
+    """Devuelve la distancia maxima entre dos vertices del grafo."""
+    maximo = 0
+    aux = grafo.inicio
+    while(aux is not None):
+        adyacentes = aux.adyacentes.inicio
+        while(adyacentes is not None):
+            if(adyacentes.info > maximo):
+                maximo = adyacentes.info
+            adyacentes = adyacentes.sig
+        aux = aux.sig
+    return maximo
+
+
+def adyacentes(vertice):
+    """Muestra los adyacents del vertice."""
+    aux = vertice.adyacentes.inicio
+    while(aux is not None):
+        print(aux.destino, aux.info)
+        aux = aux.sig
+
+def marcar_no_visitado(grafo):
+    """Marca todos losvertices del grafo como no visitados."""
+    aux = grafo.inicio
+    while(aux is not None):
+        aux.visitado = False
+        aux = aux.sig
+
+def barrido_profundidad(grafo, vertice):
+    """Barrido en profundidad del grafo."""
+    while(vertice is not None):
+        if(not vertice.visitado):
+            vertice.visitado = True
+            print(vertice.info)
+            adyacentes = vertice.adyacentes.inicio
+            while(adyacentes is not None):
+                adyacente = buscar_vertice(grafo, adyacentes.destino)
+                if(not adyacente.visitado):
+                    barrido_profundidad(grafo, adyacente)
+                adyacentes = adyacentes.sig
+        vertice = vertice.sig
+
+def barrido_distancia(grafo, distancia):
+    """Barrido en profundidad del grafo."""
+    aux = grafo.inicio
+    while(aux is not None):
+        if(aux.adyacentes.inicio is not None):
+            adyacentes = aux.adyacentes.inicio
+            while(adyacentes is not None):
+                if(adyacentes.info == distancia):
+                    print(aux.info, str("-"), adyacentes.destino)
+                adyacentes = adyacentes.sig
+        aux = aux.sig
+
+def barrido_profundidad_distancia(grafo, distancia):
+    # dado una distnaica, mostrar todos los vertices que se encuentran a esa distancia
+    lista = []
+    """Barrido en profundidad del grafo."""
+    aux = grafo.inicio
+    while(aux is not None):
+        if(aux.adyacentes.inicio is not None):
+            adyacentes = aux.adyacentes.inicio
+            while(adyacentes is not None):
+                if(adyacentes.info == distancia) and (aux.info not in lista):
+                    lista.append(aux.info)
+                adyacentes = adyacentes.sig
+        aux = aux.sig
+    return barrido_lista(lista)
+
+def barrido_lista(lista):
+    for i in range(len(lista)):
+        print(lista[i])
