@@ -1,7 +1,7 @@
 from tda_cola import Cola, cola_vacia, arribo, atencion
 from tda_heap import Heap, arribo as arribo_h, heap_vacio, atencion as atencion_h
 from tda_heap import cambiar_prioridad, buscar as buscar_h
-from tda_lista_lista import Lista, barrido, eliminar, insertar
+from tda_lista2 import Lista, barrido, eliminar, insertar
 from tda_pila_dinamico import Pila, apilar, pila_vacia, desapilar
 from math import inf
 
