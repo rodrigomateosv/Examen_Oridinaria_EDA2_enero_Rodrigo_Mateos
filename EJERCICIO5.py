@@ -45,3 +45,12 @@ def DFS(nodo, teletransportes):
             # Usamos un teletransporte y continuamos la búsqueda
             count += DFS(vecino, teletransportes - 1)
         return count
+def total_teletransportes(grafo, teletransportes):
+    total = 0
+    for nodo in grafo.nodos:
+        total += DFS(nodo, teletransportes)
+    return total
+
+# Prueba
+print(total_teletransportes(grafo, 1))  # Debería ser 20
+print(total_teletransportes(grafo, 2))  # Debería ser 46
