@@ -57,3 +57,4 @@ print(total_teletransportes(grafo, 2))  # Debería ser 46
 
 
 ##
+##def DFS(nodo, teletransportes):
