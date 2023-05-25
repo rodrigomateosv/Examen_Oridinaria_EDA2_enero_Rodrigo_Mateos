@@ -33,3 +33,15 @@ grafo.agregar_conexion(9, 2)
 grafo.agregar_conexion(9, 4)
 grafo.agregar_conexion(0, 4)
 grafo.agregar_conexion(0, 6)
+
+def DFS(nodo, teletransportes):
+    # Si hemos usado todos los teletransportes, regresamos 1
+    if teletransportes == 0:
+        return 1
+    else:
+        count = 0
+        # Visitamos todos los nodos vecinos
+        for vecino in nodo.vecinos:
+            # Usamos un teletransporte y continuamos la búsqueda
+            count += DFS(vecino, teletransportes - 1)
+        return count
