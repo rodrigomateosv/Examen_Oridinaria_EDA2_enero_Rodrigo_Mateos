@@ -13,18 +13,18 @@ def agregar_ta(tabla, hash, dato, criterio=None):
 def quitar_ta(tabla, hash, dato, criterio=None):
     posicion = hash(dato, tabla)
     if(tabla[posicion] is not None):
-        return eliminar(tabla[posicion], dato.code, criterio)  # Modificado de dato.palabra a dato.code
+        return eliminar(tabla[posicion], int(dato.nivel), criterio)
 
 def buscar_ta(tabla, hash, dato, criterio=None):
     posicion = hash(dato, tabla)
     if(tabla[posicion] is not None):
-        return busqueda(tabla[posicion], dato.code, criterio)  # Modificado de dato.palabra a dato.code
+        return busqueda(tabla[posicion], int(dato.nivel), criterio)
 
 def hash_division(clave, tabla):
     return clave % len(tabla)
 
-def hash_division_troopers(trooper, tabla):
-    return trooper.code % len(tabla)
+def hash_division_pokemon(pokemon, tabla):
+    return int(pokemon.nivel) % len(tabla)
 
 def bernstein(cadena, tabla):
     """Función hash de Bernstein para cadenas."""
@@ -33,10 +33,10 @@ def bernstein(cadena, tabla):
         h = h * 33 + ord(caracter)
     return h % len(tabla)
 
-def bernstein_troopers(trooper, tabla):
-    """Función hash de Bernstein para cadenas."""
+def bernstein_pokemon(pokemon, tabla):
+    """Función hash de Bernstein para Pokemon."""
     h = 0
-    for caracter in trooper.legion:
+    for caracter in pokemon.tipo:
         h = h * 33 + ord(caracter)
     return h % len(tabla)
 
@@ -49,3 +49,4 @@ def cantidad_elementos_ta(tabla):
 
 def cantidad_elementos_tc(tabla):
     return len(tabla) - tabla.count(None)
+
