@@ -52,9 +52,8 @@ def total_teletransportes(grafo, teletransportes):
     return total
 
 # Prueba
-print(total_teletransportes(grafo, 1))  # Debería ser 20
-print(total_teletransportes(grafo, 2))  # Debería ser 46
-
+print(total_teletransportes(grafo, 1))  
+print(total_teletransportes(grafo, 2))  
 
 ##
 ##def DFS(nodo, teletransportes):
