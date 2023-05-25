@@ -54,3 +54,6 @@ def total_teletransportes(grafo, teletransportes):
 # Prueba
 print(total_teletransportes(grafo, 1))  # Debería ser 20
 print(total_teletransportes(grafo, 2))  # Debería ser 46
+
+
+##
